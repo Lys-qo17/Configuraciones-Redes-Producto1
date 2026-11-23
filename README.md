@@ -2,7 +2,7 @@
 Conectividad sin fronteras Diseño e implementación de una red empresarial segura, segmentada y escalable.
 
 
-Lys Quezada
-Emely Jiménez 
-Yael Bautista
-Ashly Merejo
+Lys Quezada, 
+Emely Jiménez, 
+Yael Bautista y
+Ashly Merejo.
