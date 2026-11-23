@@ -9,3 +9,6 @@ for ip in $L; do
 done
 EOF
 sh t.sh
+
+
+ssh -o KexAlgorithms=+diffie-hellman-group14-sha1 -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa admin@172.20.35.65
