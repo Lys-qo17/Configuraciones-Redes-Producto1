@@ -1,0 +1,11 @@
+sudo ip link set eth1 up
+sudo udhcpc -i eth1
+
+cat > t.sh <<'EOF'
+L="172.20.0.1 172.20.32.1 172.20.32.129 172.20.33.1"
+L="$L 172.20.34.1 172.20.34.129 172.20.35.1 172.20.35.10"
+for ip in $L; do
+  if ping -c 2 -W 2 $ip >/dev/null 2>&1; then echo "$ip OK"; else echo "$ip FALLA"; fi
+done
+EOF
+sh t.sh
