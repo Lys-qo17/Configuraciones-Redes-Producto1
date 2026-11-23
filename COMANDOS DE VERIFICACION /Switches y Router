@@ -1,0 +1,10 @@
+show vlan brief
+show interfaces trunk
+show vtp status
+show etherchannel summary
+show ip interface brief
+show ip route
+show ip dhcp binding
+show ip dhcp pool
+show ipv6 interface brief
+show ipv6 route
