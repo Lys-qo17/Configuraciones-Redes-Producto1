@@ -1,0 +1,153 @@
+enable
+configure terminal
+hostname SWM1
+ip domain-name itla.local
+username admin privilege 15 secret cisco123
+enable secret class
+crypto key generate rsa modulus 1024
+ip ssh version 2
+line vty 0 4
+ login local
+ transport input ssh
+ exit
+ip routing
+ipv6 unicast-routing
+
+vtp domain R2-Core
+vtp mode server
+vtp version 2
+
+vlan 50
+ name Finanzas
+vlan 60
+ name Academicos
+vlan 70
+ name Datacenter
+vlan 98
+ name Administracion_R2
+vlan 99
+ name Blackhole_R2
+vlan 999
+ name Nativa
+exit
+
+interface vlan 50
+ description Gateway Finanzas
+ ip address 172.20.32.1 255.255.255.128
+ ipv6 address 2001:25:20:3::1/64
+ no shutdown
+
+interface vlan 60
+ description Gateway Academicos
+ ip address 172.20.32.129 255.255.255.128
+ ipv6 address 2001:25:20:2::1/64
+ no shutdown
+
+interface vlan 70
+ description Gateway Datacenter
+ ip address 172.20.35.1 255.255.255.192
+ ipv6 address 2001:25:20:4::1/64
+ no shutdown
+
+interface vlan 98
+ description Administracion switches R2
+ ip address 172.20.35.65 255.255.255.240
+ ipv6 address 2001:25:20:8::1/64
+ no shutdown
+
+interface GigabitEthernet0/0
+ description Conexion hacia SW2 (G0/0)
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 999
+ no shutdown
+
+interface GigabitEthernet0/1
+ description Conexion Routed Port hacia R1 (G0/1)
+ no switchport
+ ip address 172.20.35.98 255.255.255.252
+ ipv6 address 2001:25:20:9::2/126
+ no shutdown
+
+interface GigabitEthernet0/2
+ description Conexion hacia SW3 (G0/2)
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 999
+ no shutdown
+
+interface GigabitEthernet0/3
+ description Puerto libre - Blackhole
+ switchport mode access
+ switchport access vlan 99
+ shutdown
+exit
+
+! Rutas hacia las VLAN conectadas a R1
+ip route 172.20.0.0 255.255.224.0 172.20.35.97
+ip route 172.20.33.0 255.255.255.0 172.20.35.97
+ip route 172.20.34.0 255.255.255.128 172.20.35.97
+ip route 172.20.34.128 255.255.255.128 172.20.35.97
+ip route 172.20.35.80 255.255.255.240 172.20.35.97
+
+ipv6 route 2001:25:20:0::/64 2001:25:20:9::1
+ipv6 route 2001:25:20:1::/64 2001:25:20:9::1
+ipv6 route 2001:25:20:5::/64 2001:25:20:9::1
+ipv6 route 2001:25:20:6::/64 2001:25:20:9::1
+ipv6 route 2001:25:20:7::/64 2001:25:20:9::1
+
+service dhcp
+
+! Excluir las direcciones de los gateways y del servidor
+ip dhcp excluded-address 172.20.32.1
+ip dhcp excluded-address 172.20.32.129
+ip dhcp excluded-address 172.20.35.1 172.20.35.10
+ip dhcp excluded-address 172.20.0.1
+ip dhcp excluded-address 172.20.33.1
+ip dhcp excluded-address 172.20.34.1
+ip dhcp excluded-address 172.20.34.129
+
+ip dhcp pool POOL_FINANZAS
+ network 172.20.32.0 255.255.255.128
+ default-router 172.20.32.1
+ dns-server 8.8.8.8
+ exit
+
+ip dhcp pool POOL_ACADEMICOS
+ network 172.20.32.128 255.255.255.128
+ default-router 172.20.32.129
+ dns-server 8.8.8.8
+ exit
+
+ip dhcp pool POOL_DATACENTER
+ network 172.20.35.0 255.255.255.192
+ default-router 172.20.35.1
+ dns-server 8.8.8.8
+ exit
+
+ip dhcp pool POOL_ESTUDIANTES
+ network 172.20.0.0 255.255.224.0
+ default-router 172.20.0.1
+ dns-server 8.8.8.8
+ exit
+
+ip dhcp pool POOL_DOCENTES
+ network 172.20.34.0 255.255.255.128
+ default-router 172.20.34.1
+ dns-server 8.8.8.8
+ exit
+
+ip dhcp pool POOL_GESTION
+ network 172.20.33.0 255.255.255.0
+ default-router 172.20.33.1
+ dns-server 8.8.8.8
+ exit
+
+ip dhcp pool POOL_VOZ
+ network 172.20.34.128 255.255.255.128
+ default-router 172.20.34.129
+ dns-server 8.8.8.8
+ exit
+
+end
+write memory
