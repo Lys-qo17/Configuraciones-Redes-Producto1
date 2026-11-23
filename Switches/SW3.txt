@@ -1,0 +1,54 @@
+enable
+configure terminal
+hostname SW3
+ip domain-name itla.local
+username admin privilege 15 secret cisco123
+enable secret class
+crypto key generate rsa modulus 1024
+ip ssh version 2
+line vty 0 4
+ login local
+ transport input ssh
+ exit
+
+vtp domain R2-Core
+vtp mode client
+vtp version 2
+
+interface GigabitEthernet0/2
+ description Trunk hacia SWM1 (G0/2)
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 999
+ no shutdown
+
+interface GigabitEthernet0/0
+ description Access hacia PC Finanzas (VLAN 50)
+ switchport mode access
+ switchport access vlan 50
+ spanning-tree portfast
+ no shutdown
+
+interface GigabitEthernet0/1
+ description Access hacia PC Academicos (VLAN 60)
+ switchport mode access
+ switchport access vlan 60
+ spanning-tree portfast
+ no shutdown
+
+interface GigabitEthernet0/3
+ description Puerto libre - Blackhole
+ switchport mode access
+ switchport access vlan 99
+ shutdown
+exit
+
+! IP de administracion (VLAN 98)
+interface vlan 98
+ ip address 172.20.35.67 255.255.255.240
+ no shutdown
+exit
+ip default-gateway 172.20.35.65
+
+end
+write memory
