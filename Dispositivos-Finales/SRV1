@@ -1,3 +1,11 @@
 sudo ip link set ens2 up
 sudo ip address add 172.20.35.10/26 dev ens2
 sudo ip route replace default via 172.20.35.1
+
+
+
+Probar conectividad desde SRV1
+ping -c 4 172.20.35.1
+ping -c 4 172.20.32.1
+ping -c 4 172.20.0.1
+ping -c 4 172.20.34.1
