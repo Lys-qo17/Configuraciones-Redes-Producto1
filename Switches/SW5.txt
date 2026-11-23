@@ -1,0 +1,60 @@
+enable
+configure terminal
+hostname SW5
+ip domain-name itla.local
+username admin privilege 15 secret cisco123
+enable secret class
+crypto key generate rsa modulus 1024
+ip ssh version 2
+line vty 0 4
+ login local
+ transport input ssh
+ exit
+
+vtp domain R1-Core
+vtp mode client
+vtp version 2
+
+! EtherChannel LACP hacia SW4
+interface range GigabitEthernet0/1 - 2
+ description EtherChannel hacia SW4 (G0/1 y G0/2)
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 999
+ channel-group 1 mode passive
+ no shutdown
+exit
+
+interface Port-channel1
+ description EtherChannel LACP hacia SW4
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 999
+ no shutdown
+exit
+
+interface GigabitEthernet0/0
+ description Access hacia PC Estudiantes (VLAN 10)
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+ no shutdown
+
+interface GigabitEthernet0/3
+ description Access hacia PC Gestion (VLAN 30)
+ switchport mode access
+ switchport access vlan 30
+ spanning-tree portfast
+ no shutdown
+exit
+
+! IP de administracion (VLAN 97)
+interface vlan 97
+ ip address 172.20.35.83 255.255.255.240
+ ipv6 address 2001:25:20:7::3/64
+ no shutdown
+exit
+ip default-gateway 172.20.35.81
+
+end
+write memory
